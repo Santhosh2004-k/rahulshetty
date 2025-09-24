@@ -15,7 +15,7 @@ steps:
     mavenPomFile: 'pom.xml'
     mavenOptions: '-Xmx3072m'
     javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.11'   # uses Java 11 (must be installed on your Windows agent)
+    jdkVersionOption: '24.0.2'   # uses Java 11 (must be installed on your Windows agent)
     jdkArchitectureOption: 'x64'
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
