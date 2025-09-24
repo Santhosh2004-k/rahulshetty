@@ -4,10 +4,10 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
 trigger:
-- master
+- master   # or "main" if that's your branch
 
 pool:
-  vmImage: ubuntu-latest
+  name: Default   # <-- self-hosted pool name (check under Project Settings > Agent Pools)
 
 steps:
 - task: Maven@3
@@ -15,7 +15,7 @@ steps:
     mavenPomFile: 'pom.xml'
     mavenOptions: '-Xmx3072m'
     javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.11'
+    jdkVersionOption: '1.11'   # uses Java 11 (must be installed on your Windows agent)
     jdkArchitectureOption: 'x64'
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
