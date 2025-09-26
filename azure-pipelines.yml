@@ -1,33 +1,54 @@
-# Maven
-# Build your Java project and run tests with Apache Maven.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/java
-# santhosh ganesha
+# Maven Build + Deploy Pipeline
 trigger:
-- master   # or "main" if that's your branch
+- master  # or main
 
 pool:
-  name: Default   # <-- self-hosted pool name (check under Project Settings > Agent Pools)
+  name: Default  # Your self-hosted agent pool
 
-steps:
-- task: Maven@3
-  inputs:
-    mavenPomFile: 'pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '24.0.2'   # uses Java 11 (must be installed on your Windows agent)
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'package'
-- task: CopyFiles@2
-  inputs:
-    Contents: '**/*.war'
-    TargetFolder: '$(build.artifactstagingdirectory)'
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'rahulshatty'
-    publishLocation: 'Container'
-    
+stages:
+# --------- BUILD STAGE ---------
+- stage: Build
+  displayName: 'Build Stage'
+  jobs:
+  - job: BuildJob
+    displayName: 'Maven Build'
+    pool:
+      name: Default
+    steps:
+    - task: Maven@3
+      inputs:
+        mavenPomFile: 'pom.xml'
+        mavenOptions: '-Xmx3072m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '24.0.2'
+        jdkArchitectureOption: 'x64'
+        publishJUnitResults: true
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+        goals: 'package'
+    - task: CopyFiles@2
+      inputs:
+        Contents: '**/*.war'
+        TargetFolder: '$(build.artifactstagingdirectory)'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'rahulshatty'
+        publishLocation: 'Container'
 
+# --------- DEPLOY STAGE ---------
+- stage: Deploy
+  displayName: 'Deploy Stage'
+  dependsOn: Build
+  jobs:
+  - job: DeployJob
+    displayName: 'Deploy WAR'
+    pool:
+      name: Default  # Use self-hosted agent
+    steps:
+    - download: current
+      artifact: rahulshatty
+    - script: |
+        echo "Deploying WAR file..."
+        # Example: copy to Tomcat webapps (adjust path)
+        copy "$(Pipeline.Workspace)/rahulshatty/*.war" "C:\tomcat\webapps\"
+      displayName: 'Copy WAR to Deployment Server'
