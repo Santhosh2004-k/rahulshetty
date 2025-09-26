@@ -43,12 +43,17 @@ stages:
   - job: DeployJob
     displayName: 'Deploy WAR'
     pool:
-      name: Default  # Use self-hosted agent
+      name: Default
     steps:
     - download: current
       artifact: rahulshatty
+
     - script: |
-        echo "Deploying WAR file..."
-        # Example: copy to Tomcat webapps (adjust path)
-        copy "$(Pipeline.Workspace)/rahulshatty/*.war" "C:\tomcat\webapps\"
-      displayName: 'Copy WAR to Deployment Server'
+        echo Deploying WAR file...
+        REM Adjust the path to your Tomcat webapps folder
+        set SRC="$(Pipeline.Workspace)\rahulshatty\*.war"
+        set DEST="C:\tomcat\webapps\"
+        echo Copying %SRC% to %DEST%
+        copy %SRC% %DEST%
+        displayName: 'Copy WAR to Deployment Server'
+        shell: cmd
