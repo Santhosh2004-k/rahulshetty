@@ -52,7 +52,7 @@ stages:
         echo Deploying WAR file...
         REM Adjust the path to your Tomcat webapps folder
         set SRC=%AGENT_WORKSPACE%\_work\3\rahulshatty\*.war
-        set DEST=C:\tomcat\webapps\
+        set DEST=C:\Users\santhosh k\Desktop\azure devops\apache-tomcat-10.1.46\webapps
         echo Copying %SRC% to %DEST%
         copy %SRC% %DEST%
       displayName: 'Copy WAR to Deployment Server'
