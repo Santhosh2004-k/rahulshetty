@@ -51,9 +51,11 @@ stages:
     - script: |
         echo Deploying WAR file...
         REM Adjust the path to your Tomcat webapps folder
-        set SRC="$(Pipeline.Workspace)\rahulshatty\*.war"
-        set DEST="C:\tomcat\webapps\"
+        set SRC=%AGENT_WORKSPACE%\_work\3\rahulshatty\*.war
+        set DEST=C:\tomcat\webapps\
         echo Copying %SRC% to %DEST%
         copy %SRC% %DEST%
-        displayName: 'Copy WAR to Deployment Server'
-        shell: cmd
+      displayName: 'Copy WAR to Deployment Server'
+
+    - script: dir "%AGENT_WORKSPACE%\_work\3\rahulshatty"
+      displayName: 'List downloaded artifact'
