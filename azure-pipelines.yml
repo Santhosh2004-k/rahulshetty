@@ -50,12 +50,13 @@ stages:
 
     - script: |
         echo Deploying WAR file...
-        REM Adjust the path to your Tomcat webapps folder
-        set SRC=%AGENT_WORKSPACE%\_work\3\rahulshatty\*.war
+        set SRC=$(Pipeline.Workspace)\rahulshatty\*.war
         set DEST=C:\Users\santhosh k\Desktop\azure devops\apache-tomcat-10.1.46\webapps
+        REM Create destination folder if it doesn't exist
+        if not exist "%DEST%" mkdir "%DEST%"
         echo Copying %SRC% to %DEST%
-        copy %SRC% %DEST%
+        copy "%SRC%" "%DEST%"
       displayName: 'Copy WAR to Deployment Server'
 
-    - script: dir "%AGENT_WORKSPACE%\_work\3\rahulshatty"
+    - script: dir "$(Pipeline.Workspace)\rahulshatty"
       displayName: 'List downloaded artifact'
