@@ -32,7 +32,7 @@ stages:
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'rahulshatty'
+        ArtifactName: 'rahulshetty'
         publishLocation: 'Container'
 
 # --------- DEPLOY STAGE ---------
@@ -46,11 +46,11 @@ stages:
       name: Default
     steps:
     - download: current
-      artifact: rahulshatty
+      artifact: rahulshetty
 
     - script: |
         echo Deploying WAR file...
-        set SRC=$(Pipeline.Workspace)\rahulshatty\*.war
+        set SRC=$(Pipeline.Workspace)\rahulshetty\webapp\target\webapp.war
         set DEST=C:\Users\santhosh k\Desktop\azure devops\apache-tomcat-10.1.46\webapps
         REM Create destination folder if it doesn't exist
         if not exist "%DEST%" mkdir "%DEST%"
@@ -58,5 +58,5 @@ stages:
         copy "%SRC%" "%DEST%"
       displayName: 'Copy WAR to Deployment Server'
 
-    - script: dir "$(Pipeline.Workspace)\rahulshatty"
+    - script: dir "$(Pipeline.Workspace)\rahulshetty"
       displayName: 'List downloaded artifact'
