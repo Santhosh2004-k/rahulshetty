@@ -55,8 +55,9 @@ stages:
       artifact: rahulshetty
 
     - task: AzureWebApp@1
-      displayName: 'Deploy WAR to Azure WebApp'
+      displayName: 'Deploy WAR to Azure Web App'
       inputs:
-        azureSubscription: 'Santhosh2004-k'   # 👈 use exact service connection name
-        appName: 'rahulshetty'                # Your WebApp name
-        package: '$(Pipeline.Workspace)/rahulshetty/**/*.war'
+        azureSubscription: 'Azure subscription 1(905c3372-28e9-46c9-9959-66131db0ca93)'
+        appType: 'webApp'
+        appName: 'SanthoshVignesh2701'
+        package: '$(System.DefaultWorkingDirectory)/**/*.war'
