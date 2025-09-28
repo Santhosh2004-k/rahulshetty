@@ -60,4 +60,4 @@ stages:
         azureSubscription: 'Azure subscription 1(905c3372-28e9-46c9-9959-66131db0ca93)'
         appType: 'webApp'
         appName: 'SanthoshVignesh2701'
-        package: '$(System.DefaultWorkingDirectory)/**/*.war'
+        package: 'C:\Users\santhosh k\Desktop\azure devops\vsts-agent-win-x64-4.261.0\_work\4\rahulshetty\webapp\target'
