@@ -41,13 +41,13 @@ stages:
         ArtifactName: 'rahulshetty'
         publishLocation: 'Container'
 
-# --------- DEPLOY STAGE ---------
-- stage: Deploy
-  displayName: 'Deploy Stage'
+# --------- DEPLOY TO STAGING ---------
+- stage: Deploy_Staging
+  displayName: 'Deploy to Staging'
   dependsOn: Build
   jobs:
-  - job: DeployJob
-    displayName: 'Deploy to Azure WebApp'
+  - job: DeployStaging
+    displayName: 'Deploy WAR to Staging WebApp'
     pool:
       name: Default
     steps:
@@ -55,65 +55,59 @@ stages:
       artifact: rahulshetty
 
     - task: AzureWebApp@1
-      displayName: 'Deploy WAR to Azure Web App'
+      displayName: 'Deploy WAR to Azure Web App (Staging)'
       inputs:
         azureSubscription: 'Azure subscription 1(905c3372-28e9-46c9-9959-66131db0ca93)'
         appType: 'webApp'
-        appName: 'SanthoshVignesh2701'
-        package: 'C:\Users\santhosh k\Desktop\azure devops\vsts-agent-win-x64-4.261.0\_work\4\rahulshetty\webapp\target'
+        appName: 'SanthoshVignesh2701'   # your staging webapp name
+        package: '$(Pipeline.Workspace)/rahulshetty/**/*.war'
 
-
-# --------- Test STAGE ---------
-- stage: Test
-  displayName: 'Test Stage'
+# --------- TEST AFTER STAGING DEPLOY ---------
+- stage: Test_Automation
+  displayName: 'Run Automation Tests on Staging'
+  dependsOn: Deploy_Staging
   jobs:
   - job: TestJob
-    displayName: 'Maven Build'
+    displayName: 'Run Automation Tests'
     pool:
       name: Default
     steps:
+    # Example: Run Selenium/TestNG/JUnit tests
     - task: Maven@3
-      displayName: 'Maven Package'
+      displayName: 'Run Automation Tests'
       inputs:
         mavenPomFile: 'pom.xml'
-        mavenOptions: '-Xmx3072m'
-        javaHomeOption: 'JDKVersion'
-        jdkVersionOption: '24.0.2'
-        jdkArchitectureOption: 'x64'
+        goals: 'test'
         publishJUnitResults: true
         testResultsFiles: '**/surefire-reports/TEST-*.xml'
-        goals: 'Test'
 
-    - task: CopyFiles@2
-      displayName: 'Copy WAR to staging'
+    # Publish test results in Azure DevOps Tests tab
+    - task: PublishTestResults@2
+      displayName: 'Publish Test Results'
       inputs:
-        Contents: '**/*.war'
-        TargetFolder: '$(Test.ArtifactStagingDirectory)'
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+        mergeTestResults: true
+        failTaskOnFailedTests: true
 
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish WAR as Artifact'
-      inputs:
-        PathtoPublish: '$(Test.ArtifactStagingDirectory)'
-        ArtifactName: 'shetty'
-        publishLocation: 'Container'
-
-# --------- DEPLOY STAGE ---------
-- stage: AfterDeploy
-  displayName: 'After Deploy Stage'
-  dependsOn: Build
+# --------- DEPLOY TO PRODUCTION ---------
+- stage: Deploy_Production
+  displayName: 'Deploy to Production'
+  dependsOn: Test_Automation
+  condition: succeeded()   # only runs if tests passed
   jobs:
-  - job: DeployJob
-    displayName: 'Deploy to Azure WebApp'
+  - job: DeployProd
+    displayName: 'Deploy WAR to Production WebApp'
     pool:
       name: Default
     steps:
     - download: current
-      artifact: shetty
+      artifact: rahulshetty
 
     - task: AzureWebApp@1
-      displayName: 'Deploy WAR to Azure Web App'
+      displayName: 'Deploy WAR to Azure Web App (Production)'
       inputs:
         azureSubscription: 'Azure subscription 1(905c3372-28e9-46c9-9959-66131db0ca93)'
         appType: 'webApp'
-        appName: 'SanthoshVignesh2701'
-        package: 'C:\Users\santhosh k\Desktop\azure devops\vsts-agent-win-x64-4.261.0\_work\4\rahulshetty\webapp\target'
+        appName: 'SanthoshVignesh2701-prod'   # your production webapp name
+        package: '$(Pipeline.Workspace)/rahulshetty/**/*.war'
