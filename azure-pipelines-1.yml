@@ -61,3 +61,59 @@ stages:
         appType: 'webApp'
         appName: 'SanthoshVignesh2701'
         package: 'C:\Users\santhosh k\Desktop\azure devops\vsts-agent-win-x64-4.261.0\_work\4\rahulshetty\webapp\target'
+
+
+# --------- Test STAGE ---------
+- stage: Test
+  displayName: 'Test Stage'
+  jobs:
+  - job: TestJob
+    displayName: 'Maven Build'
+    pool:
+      name: Default
+    steps:
+    - task: Maven@3
+      displayName: 'Maven Package'
+      inputs:
+        mavenPomFile: 'pom.xml'
+        mavenOptions: '-Xmx3072m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '24.0.2'
+        jdkArchitectureOption: 'x64'
+        publishJUnitResults: true
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+        goals: 'Test'
+
+    - task: CopyFiles@2
+      displayName: 'Copy WAR to staging'
+      inputs:
+        Contents: '**/*.war'
+        TargetFolder: '$(Test.ArtifactStagingDirectory)'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish WAR as Artifact'
+      inputs:
+        PathtoPublish: '$(Test.ArtifactStagingDirectory)'
+        ArtifactName: 'shetty'
+        publishLocation: 'Container'
+
+# --------- DEPLOY STAGE ---------
+- stage: AfterDeploy
+  displayName: 'After Deploy Stage'
+  dependsOn: Build
+  jobs:
+  - job: DeployJob
+    displayName: 'Deploy to Azure WebApp'
+    pool:
+      name: Default
+    steps:
+    - download: current
+      artifact: shetty
+
+    - task: AzureWebApp@1
+      displayName: 'Deploy WAR to Azure Web App'
+      inputs:
+        azureSubscription: 'Azure subscription 1(905c3372-28e9-46c9-9959-66131db0ca93)'
+        appType: 'webApp'
+        appName: 'SanthoshVignesh2701'
+        package: 'C:\Users\santhosh k\Desktop\azure devops\vsts-agent-win-x64-4.261.0\_work\4\rahulshetty\webapp\target'
