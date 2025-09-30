@@ -38,7 +38,7 @@ stages:
       displayName: 'Publish WAR as Artifact'
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'rahulshetty'
+        ArtifactName: 'rahulshtty'
         publishLocation: 'Container'
 
 # --------- DEPLOY TO STAGING ---------
@@ -52,7 +52,7 @@ stages:
       name: Default
     steps:
     - download: current
-      artifact: rahulshetty
+      artifact: rahulshtty
 
     - task: AzureWebApp@1
       displayName: 'Deploy WAR to Azure Web App (Staging)'
@@ -60,7 +60,7 @@ stages:
         azureSubscription: 'Azure subscription 1(905c3372-28e9-46c9-9959-66131db0ca93)'
         appType: 'webApp'
         appName: 'SanthoshVignesh2701'   # your staging webapp name
-        package: '$(Pipeline.Workspace)/rahulshetty/**/*.war'
+        package: C:\Users\santhosh k\Desktop\azure devops\vsts-agent-win-x64-4.261.0\_work\4\rahulshtty\webapp\target
 
 # --------- TEST AFTER STAGING DEPLOY ---------
 - stage: Test_Automation
@@ -102,7 +102,7 @@ stages:
       name: Default
     steps:
     - download: current
-      artifact: rahulshetty
+      artifact: rahulshtty
 
     - task: AzureWebApp@1
       displayName: 'Deploy WAR to Azure Web App (Production)'
@@ -110,4 +110,4 @@ stages:
         azureSubscription: 'Azure subscription 1(905c3372-28e9-46c9-9959-66131db0ca93)'
         appType: 'webApp'
         appName: 'SanthoshVignesh2701-prod'   # your production webapp name
-        package: '$(Pipeline.Workspace)/rahulshetty/**/*.war'
+        package: C:\Users\santhosh k\Desktop\azure devops\vsts-agent-win-x64-4.261.0\_work\4\rahulshtty\webapp\target
